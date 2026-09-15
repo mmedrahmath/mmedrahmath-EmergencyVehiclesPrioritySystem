@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVPS - Emergency Vehicles Priority System | Team PHANTOM DELUX</title>
+  
+  <!-- Modern Typography (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+
+  <div id="app-container">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge">EVPS</div>
+        <div class="brand-title">
+          <span>PRIORITY</span>
+          <small>PHANTOM DELUX</small>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li class="nav-item active">
+          <a href="#landing" data-nav="landing">
+            <i class="fas fa-home"></i>
+            <span>Overview & Idea</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#dashboard" data-nav="dashboard">
+            <i class="fas fa-satellite-dish"></i>
+            <span>Live Command Center</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#trip-view" data-nav="trip-view">
+            <i class="fas fa-route"></i>
+            <span>Emergency Trip HUD</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#ambulances" data-nav="ambulances">
+            <i class="fas fa-ambulance"></i>
+            <span>Ambulance Fleet</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#junctions" data-nav="junctions">
+            <i class="fas fa-traffic-light"></i>
+            <span>Traffic Junctions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#analytics" data-nav="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics & Reports</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#admin" data-nav="admin">
+            <i class="fas fa-sliders-h"></i>
+            <span>Admin & Hardware</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#login" data-nav="login">
+            <i class="fas fa-user-shield"></i>
+            <span>Authentication</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#support" data-nav="support">
+            <i class="fas fa-headset" style="color: var(--accent-cyan);"></i>
+            <span>Customer Support</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="system-mode-tag">
+          <span>SYSTEM MODE</span>
+          <span class="mode-badge sim">SIMULATION</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted);">
+          <span>EVPS v2.4 (SIH 2026)</span>
+          <span style="color: var(--accent-green);"><i class="fas fa-shield-alt"></i> FAILSAFE ON</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobile-menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="header-title-wrap">
+            <h1>
+              <i class="fas fa-shield-virus" style="color: #ff1744;"></i>
+              <span>Emergency Vehicles Priority System</span>
+            </h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div id="ws-connection-badge" class="live-indicator">
+            <span class="pulse-dot"></span>
+            <span>CONNECTING...</span>
+          </div>
+
+          <div id="user-role-badge" class="badge badge-cyan" style="cursor: pointer;" onclick="window.evpsApp.navigateTo('login')">
+            ADMIN: Sharma (EVPS-01)
+          </div>
+
+          <button class="btn btn-secondary" id="theme-toggle-btn" style="padding: 6px 12px;" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 1: LANDING & HARDWARE OVERVIEW -->
+      <!-- ================================================================= -->
+      <section id="page-landing" class="page-view active-page">
+        <div class="hero-section">
+          <div class="hero-tag">
+            <i class="fas fa-microchip"></i> SMART VEHICLES • TEAM PHANTOM DELUX
+          </div>
+          <h2 class="hero-headline">CLEAR THE WAY.<br>SAVE CRITICAL TIME.</h2>
+          <p class="hero-subtext">
+            An intelligent emergency vehicle traffic preemption platform designed to eliminate ambulance delays at signalized intersections using ESP32, high-precision GPS geofencing, and automated RF/Wireless traffic light controllers.
+          </p>
+          <div class="hero-btn-group">
+            <button class="btn btn-emergency" onclick="window.evpsApp.navigateTo('dashboard'); window.evpsSimUI.startEmergencyDemo('A-001', 1);">
+              <i class="fas fa-play"></i> Launch Live Dashboard & Demo
+            </button>
+            <button class="btn btn-secondary" onclick="window.evpsApp.navigateTo('admin')">
+              <i class="fas fa-code"></i> ESP32 Firmware Specs
+            </button>
+          </div>
+        </div>
+
+        <!-- Animated Workflow Chart -->
+        <div class="glass-panel" style="padding: 30px; margin-bottom: 30px;">
+          <h3 style="text-align: center; margin-bottom: 20px; font-size: 20px;">
+            <i class="fas fa-project-diagram" style="color: var(--accent-cyan);"></i> HOW EVPS SYSTEM WORKS
+          </h3>
+          <div class="flowchart-grid">
+            <div class="flow-step-card glass-panel">
+              <div class="flow-step-num">1</div>
+              <h4>🚑 AMBULANCE</h4>
+              <p>Emergency dispatch triggered with critical patient.</p>
+            </div>
+            <div class="flow-step-card glass-panel">
+              <div class="flow-step-num">2</div>
+              <h4>📍 GPS + ESP32</h4>
+              <p>Transmitter captures real-time coordinates & speed.</p>
+            </div>
+            <div class="flow-step-card glass-panel">
+              <div class="flow-step-num">3</div>
+              <h4>📡 RF TRANSMIT</h4>
+              <p>Priority request transmitted wirelessly to corridor.</p>
+            </div>
+            <div class="flow-step-card glass-panel">
+              <div class="flow-step-num">4</div>
+              <h4>🚦 JUNCTION RX</h4>
+              <p>Receiver acknowledges and locks green priority signal.</p>
+            </div>
+            <div class="flow-step-card glass-panel">
+              <div class="flow-step-num">5</div>
+              <h4>✓ AMBULANCE PASSES</h4>
+              <p>Crossing event detected and priority safely cleared.</p>
+            </div>
+            <div class="flow-step-card glass-panel">
+              <div class="flow-step-num">6</div>
+              <h4>🟢 NORMAL CYCLE</h4>
+              <p>Signal automatically restores to standard traffic timing.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Physical Prototype Hardware Specifications -->
+        <div class="glass-panel" style="padding: 30px;">
+          <h3 style="margin-bottom: 16px; font-size: 18px;">
+            <i class="fas fa-cogs" style="color: var(--accent-amber);"></i> HARDWARE PROTOTYPE ARCHITECTURE
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+            <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-cyan);">
+              <h4 style="color: var(--accent-cyan); margin-bottom: 8px;"><i class="fas fa-truck-medical"></i> Ambulance Unit (Transmitter)</h4>
+              <ul style="font-size: 13px; color: var(--text-secondary); list-style-position: inside; line-height: 1.8;">
+                <li><strong>Microcontroller:</strong> ESP32-WROOM-32 (240MHz Dual-Core)</li>
+                <li><strong>GPS Module:</strong> u-blox NEO-6M (High refresh rate)</li>
+                <li><strong>RF Transmitter:</strong> NRF24L01+ with PA/LNA (1.1 km range)</li>
+                <li><strong>Operator Interface:</strong> Emergency button & TFT status</li>
+              </ul>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-green);">
+              <h4 style="color: var(--accent-green); margin-bottom: 8px;"><i class="fas fa-traffic-light"></i> Traffic Junction Unit (Receiver)</h4>
+              <ul style="font-size: 13px; color: var(--text-secondary); list-style-position: inside; line-height: 1.8;">
+                <li><strong>Receiver Unit:</strong> ESP32 with NRF24L01 wireless node</li>
+                <li><strong>Signal Switching:</strong> 3-Channel Solid-State / 5V Relay</li>
+                <li><strong>Safety Failsafe:</strong> 45s Hardware Watchdog Timeout</li>
+                <li><strong>Mesh Communication:</strong> Wi-Fi / MQTT Central Backhaul</li>
+              </ul>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-red);">
+              <h4 style="color: var(--accent-red); margin-bottom: 8px;"><i class="fas fa-shield-alt"></i> Safety & Failsafe Assurance</h4>
+              <ul style="font-size: 13px; color: var(--text-secondary); list-style-position: inside; line-height: 1.8;">
+                <li><strong>Stale Request Rejection:</strong> Never locks green permanently</li>
+                <li><strong>Failsafe Reversion:</strong> Automatically resets on signal drop</li>
+                <li><strong>Sim vs Live Dual Mode:</strong> Physical bench testing ready</li>
+                <li><strong>Audit Logging:</strong> Timestamped crossing records</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 2: LIVE DASHBOARD / COMMAND CENTER -->
+      <!-- ================================================================= -->
+      <section id="page-dashboard" class="page-view">
+        
+        <!-- TOP KPI METRICS -->
+        <div class="kpi-grid">
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>System Status</small>
+              <div class="kpi-value" style="color: var(--accent-green); font-size: 18px;"><i class="fas fa-check-circle"></i> ONLINE</div>
+            </div>
+            <div class="kpi-icon-wrap green"><i class="fas fa-heartbeat"></i></div>
+          </div>
+
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Active Emergencies</small>
+              <div class="kpi-value" id="kpi-active-emergencies">1</div>
+            </div>
+            <div class="kpi-icon-wrap red"><i class="fas fa-ambulance"></i></div>
+          </div>
+
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Total Ambulances</small>
+              <div class="kpi-value">4</div>
+            </div>
+            <div class="kpi-icon-wrap cyan"><i class="fas fa-truck-medical"></i></div>
+          </div>
+
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Junctions Online</small>
+              <div class="kpi-value">8 / 8</div>
+            </div>
+            <div class="kpi-icon-wrap amber"><i class="fas fa-traffic-light"></i></div>
+          </div>
+        </div>
+
+        <!-- SIMULATION ACTION & FAULT CONTROL BAR -->
+        <div class="sim-controls-bar glass-panel">
+          <div class="sim-actions-group">
+            <button class="btn btn-emergency" id="btn-start-demo">
+              <i class="fas fa-play"></i> START EMERGENCY DEMO
+            </button>
+            <button class="btn btn-secondary" id="btn-pause-demo" title="Pause simulation">
+              <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn btn-secondary" id="btn-resume-demo" title="Resume simulation">
+              <i class="fas fa-play-circle"></i> Resume
+            </button>
+            <button class="btn btn-secondary" id="btn-reset-demo" title="Reset simulation">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+            <button class="btn btn-secondary" id="btn-toggle-siren" title="Toggle Siren Sound">
+              <i class="fas fa-volume-up"></i> Siren ON
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <!-- Speed Selector -->
+            <div class="speed-selector">
+              <span>Speed:</span>
+              <button class="speed-btn" data-speed="1.0">1x</button>
+              <button class="speed-btn active" data-speed="1.5">1.5x</button>
+              <button class="speed-btn" data-speed="2.5">2.5x</button>
+              <button class="speed-btn" data-speed="4.0">4x</button>
+            </div>
+
+            <!-- Fault Injections for Presentation Testing -->
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px;">
+              <span>Test Faults:</span>
+              <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                <input type="checkbox" id="fault-gps-loss"> GPS Drop
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                <input type="checkbox" id="fault-rx-offline"> RX Offline
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- RAPIDO / UBER STYLE EMERGENCY TRIP HUD -->
+        <div class="trip-hud-container glass-panel">
+          <div class="hud-route-stepper">
+            <div class="hud-step active">
+              <div class="hud-step-icon"><i class="fas fa-ambulance"></i></div>
+              <div class="hud-step-text">
+                <h4>AMBULANCE A-001</h4>
+                <p>Connaught Corridor</p>
+              </div>
+            </div>
+
+            <div class="hud-divider-line">
+              <div class="hud-divider-progress" id="hud-progress-fill" style="width: 25%;"></div>
+            </div>
+
+            <div class="hud-step" id="hud-step-junc">
+              <div class="hud-step-icon"><i class="fas fa-traffic-light"></i></div>
+              <div class="hud-step-text">
+                <h4>NEXT JUNCTION</h4>
+                <p id="hud-next-junc-label">J-04 Tilak Marg</p>
+              </div>
+            </div>
+
+            <div class="hud-divider-line"></div>
+
+            <div class="hud-step">
+              <div class="hud-step-icon" style="background: #2563eb; color: white;"><i class="fas fa-hospital-alt"></i></div>
+              <div class="hud-step-text">
+                <h4>DESTINATION</h4>
+                <p>Apex Trauma Hospital</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="hud-metrics-row">
+            <div class="hud-metric-item">
+              <i class="fas fa-tachometer-alt"></i>
+              <div>
+                <small>Current Speed</small>
+                <strong id="hud-speed-val">48.2 km/h</strong>
+              </div>
+            </div>
+            <div class="hud-metric-item">
+              <i class="fas fa-road"></i>
+              <div>
+                <small>Distance Remaining</small>
+                <strong id="hud-dist-val">4.2 km</strong>
+              </div>
+            </div>
+            <div class="hud-metric-item">
+              <i class="fas fa-clock"></i>
+              <div>
+                <small>Estimated Arrival</small>
+                <strong id="hud-eta-val">5m 14s</strong>
+              </div>
+            </div>
+            <div class="hud-metric-item">
+              <i class="fas fa-satellite"></i>
+              <div>
+                <small>GPS Lock</small>
+                <strong style="color: var(--accent-green);"><i class="fas fa-check"></i> CONNECTED</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISUAL STEP-BY-STEP TIMELINE -->
+        <div class="timeline-card glass-panel">
+          <div style="font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px;">
+            <i class="fas fa-stream"></i> PRIORITY STAGES LIFECYCLE
+          </div>
+          <div class="step-timeline-horizontal">
+            <div class="t-step completed" id="t-step-1">
+              <div class="t-step-circle">1</div>
+              <span>Emergency Active</span>
+            </div>
+            <div class="t-step completed" id="t-step-2">
+              <div class="t-step-circle">2</div>
+              <span>GPS Connected</span>
+            </div>
+            <div class="t-step" id="t-step-3">
+              <div class="t-step-circle">3</div>
+              <span>Junction Detected</span>
+            </div>
+            <div class="t-step" id="t-step-4">
+              <div class="t-step-circle">4</div>
+              <span>Priority Request</span>
+            </div>
+            <div class="t-step" id="t-step-5">
+              <div class="t-step-circle">5</div>
+              <span>RX Acknowledged</span>
+            </div>
+            <div class="t-step" id="t-step-6">
+              <div class="t-step-circle">6</div>
+              <span>GREEN PRIORITY</span>
+            </div>
+            <div class="t-step" id="t-step-7">
+              <div class="t-step-circle">7</div>
+              <span>Ambulance Crosses</span>
+            </div>
+            <div class="t-step" id="t-step-8">
+              <div class="t-step-circle">8</div>
+              <span>Priority Cleared</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPLIT GRID: LIVE MAP + 3D TRAFFIC LIGHT & RADAR -->
+        <div class="dashboard-grid">
+          
+          <!-- LIVE INTERACTIVE MAP -->
+          <div class="map-card glass-panel">
+            <div class="map-overlay-badge">
+              <span class="pulse-dot"></span>
+              <span>LIVE GPS TELEMETRY MAP</span>
+            </div>
+            <div id="leaflet-map"></div>
+          </div>
+
+          <!-- SIDE COMMAND COLUMN -->
+          <div class="side-command-col">
+            
+            <!-- REALISTIC 3D TRAFFIC LIGHT -->
+            <div class="traffic-light-card glass-panel">
+              <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">
+                <i class="fas fa-traffic-light"></i> JUNCTION SIGNAL CONTROLLER
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="signal-junc-label">
+                J-04 Tilak Marg Metro
+              </div>
+
+              <!-- Physical Light Housing with 3 Lenses -->
+              <div class="traffic-light-housing">
+                <div class="signal-lens-wrap">
+                  <div class="signal-hood"></div>
+                  <div class="signal-lens red active" id="lens-red"></div>
+                </div>
+                <div class="signal-lens-wrap">
+                  <div class="signal-hood"></div>
+                  <div class="signal-lens yellow" id="lens-yellow"></div>
+                </div>
+                <div class="signal-lens-wrap">
+                  <div class="signal-hood"></div>
+                  <div class="signal-lens green" id="lens-green"></div>
+                </div>
+              </div>
+
+              <!-- Priority Status Banner -->
+              <div class="priority-banner normal" id="signal-priority-banner">
+                <i class="fas fa-shield-alt"></i> NORMAL TRAFFIC CYCLE (RED)
+              </div>
+            </div>
+
+            <!-- UPCOMING JUNCTION RADAR -->
+            <div class="radar-card glass-panel">
+              <div class="radar-header">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                  <i class="fas fa-crosshairs" style="color: var(--accent-cyan);"></i> CORRIDOR RADAR
+                </span>
+                <span class="badge badge-cyan" id="radar-distance-text">240m</span>
+              </div>
+              <div class="radar-body">
+                <div class="radar-dial">
+                  <div class="radar-sweep"></div>
+                  <i class="fas fa-satellite-dish" style="color: var(--accent-cyan); font-size: 20px;"></i>
+                </div>
+                <div class="radar-info-text">
+                  <h3 id="radar-junction-name">J-04 Tilak Marg</h3>
+                  <p>Receiver: <code>RX-ESP32-J04</code> (2.4 GHz)</p>
+                  <div style="margin-top: 6px;" id="radar-junction-status">
+                    <span class="badge badge-amber"><i class="fas fa-paper-plane"></i> PRIORITY REQUESTED</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- LIVE EVENT LOG FEED -->
+        <div class="glass-panel" style="padding: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 14px; font-weight: 700;">
+              <i class="fas fa-list-alt" style="color: var(--accent-cyan);"></i> LIVE SYSTEM EVENT LOGS & CLEARANCES
+            </h3>
+            <span style="font-size: 11px; color: var(--text-muted);">Auto-updating WebSocket stream</span>
+          </div>
+          <div class="event-log-container" id="live-event-logs-list">
+            <div class="log-entry INFO">
+              <span class="log-time">21:30:15</span>
+              <span class="log-source">SYSTEM</span>
+              <span class="log-msg">EVPS Core initialized in SIMULATION mode.</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 3: DEDICATED EMERGENCY TRIP VIEW -->
+      <!-- ================================================================= -->
+      <section id="page-trip-view" class="page-view">
+        <div class="glass-panel" style="padding: 24px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <span class="badge badge-red" style="font-size: 13px;"><i class="fas fa-exclamation-triangle"></i> EMERGENCY TRIP ACTIVE</span>
+              <h2 style="font-size: 22px; margin-top: 6px;">DISPATCH: AMBULANCE A-001</h2>
+              <p style="color: var(--text-secondary); font-size: 13px;">Critical Trauma Case • Destination: City Apex Trauma Hospital</p>
+            </div>
+            <button class="btn btn-emergency" onclick="window.evpsSimUI.startEmergencyDemo('A-001', 1);">
+              <i class="fas fa-redo"></i> Restart Trip Simulation
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+          <div class="glass-panel" style="padding: 20px;">
+            <h3 style="font-size: 16px; margin-bottom: 14px;"><i class="fas fa-history"></i> Junction Crossings On Current Trip</h3>
+            <div id="trip-view-crossings" style="display: flex; flex-direction: column; gap: 10px;">
+              <p style="font-size: 12px; color: #64748b;">No junction crossings logged yet. Start simulation above.</p>
+            </div>
+          </div>
+
+          <div class="glass-panel" style="padding: 20px;">
+            <h3 style="font-size: 16px; margin-bottom: 14px;"><i class="fas fa-info-circle"></i> Hospital Destination Info</h3>
+            <div style="font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
+              <p><strong>Hospital:</strong> City Apex Trauma Hospital</p>
+              <p><strong>Address:</strong> Ring Road, Central Corridor</p>
+              <p><strong>Trauma Level:</strong> Level-1 Comprehensive</p>
+              <p><strong>Available ICU Beds:</strong> 24 Ready</p>
+              <p><strong>Emergency Contact:</strong> +91-11-23456789</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 4: AMBULANCES FLEET -->
+      <!-- ================================================================= -->
+      <section id="page-ambulances" class="page-view">
+        <div class="glass-panel" style="padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-size: 18px;"><i class="fas fa-ambulance" style="color: var(--accent-cyan);"></i> Ambulance Fleet Management</h2>
+            <button class="btn btn-primary btn-sm" onclick="window.evpsApp.showToast('Registering new ambulance...', 'info');">
+              <i class="fas fa-plus"></i> Register Ambulance
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-panel data-table-wrap">
+          <table class="evps-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Callsign</th>
+                <th>Plate</th>
+                <th>ESP32 Device</th>
+                <th>Status</th>
+                <th>GPS Fix</th>
+                <th>Speed</th>
+                <th>Assigned Hospital</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fleet-table-body">
+              <!-- Rendered via pages.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 5: TRAFFIC JUNCTIONS -->
+      <!-- ================================================================= -->
+      <section id="page-junctions" class="page-view">
+        <div class="glass-panel" style="padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-size: 18px;"><i class="fas fa-traffic-light" style="color: var(--accent-amber);"></i> Traffic Junction Receivers & Relays</h2>
+            <span class="badge badge-green">8 / 8 RECEIVERS ONLINE</span>
+          </div>
+        </div>
+
+        <div id="junctions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <!-- Rendered via pages.js -->
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 6: ANALYTICS & REPORTS -->
+      <!-- ================================================================= -->
+      <section id="page-analytics" class="page-view">
+        <div class="kpi-grid">
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Total Emergency Trips</small>
+              <div class="kpi-value" id="analytics-total-trips">18</div>
+            </div>
+            <div class="kpi-icon-wrap cyan"><i class="fas fa-route"></i></div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Junction Crossings</small>
+              <div class="kpi-value" id="analytics-total-crossings">54</div>
+            </div>
+            <div class="kpi-icon-wrap green"><i class="fas fa-check-double"></i></div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Avg Clearance Time</small>
+              <div class="kpi-value" id="analytics-avg-clearance">16.2s</div>
+            </div>
+            <div class="kpi-icon-wrap amber"><i class="fas fa-stopwatch"></i></div>
+          </div>
+          <div class="kpi-card glass-panel">
+            <div class="kpi-info">
+              <small>Time Saved for Patients</small>
+              <div class="kpi-value" id="analytics-time-saved" style="color: var(--accent-green);">25.6 min</div>
+            </div>
+            <div class="kpi-icon-wrap red"><i class="fas fa-heart"></i></div>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 24px; margin-bottom: 20px;">
+          <h3 style="font-size: 16px; margin-bottom: 14px;"><i class="fas fa-chart-bar"></i> Junction Performance & Reliability</h3>
+          <div class="data-table-wrap">
+            <table class="evps-table">
+              <thead>
+                <tr>
+                  <th>Junction Code</th>
+                  <th>Intersection Name</th>
+                  <th>Total Priority Crossings</th>
+                  <th>Avg Clearance Duration</th>
+                  <th>Receiver Reliability</th>
+                </tr>
+              </thead>
+              <tbody id="analytics-junctions-table">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 7: ADMIN & ESP32 HARDWARE SETUP -->
+      <!-- ================================================================= -->
+      <section id="page-admin" class="page-view">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          
+          <!-- Distance Thresholds Configuration -->
+          <div class="glass-panel" style="padding: 24px;">
+            <h3 style="font-size: 16px; margin-bottom: 18px;"><i class="fas fa-sliders-h" style="color: var(--accent-cyan);"></i> Geofence Priority Distance Thresholds</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Approach Detection Distance (Meters):</label>
+                <input type="number" id="cfg-approaching" class="btn btn-secondary" style="width: 100%; text-align: left;" value="500">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Prepare Priority Distance (Meters):</label>
+                <input type="number" id="cfg-prepare" class="btn btn-secondary" style="width: 100%; text-align: left;" value="250">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Activate GREEN Signal Distance (Meters):</label>
+                <input type="number" id="cfg-activate" class="btn btn-secondary" style="width: 100%; text-align: left;" value="120">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Clearance Threshold Distance (Meters):</label>
+                <input type="number" id="cfg-clearance" class="btn btn-secondary" style="width: 100%; text-align: left;" value="50">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Safety Priority Timeout (Seconds):</label>
+                <input type="number" id="cfg-timeout" class="btn btn-secondary" style="width: 100%; text-align: left;" value="45">
+              </div>
+              
+              <button class="btn btn-primary" onclick="window.evpsPages.saveAdminConfig()" style="margin-top: 10px;">
+                <i class="fas fa-save"></i> Save Geofence Settings
+              </button>
+            </div>
+          </div>
+
+          <!-- ESP32 Arduino Firmware Viewer -->
+          <div class="glass-panel" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="font-size: 16px;"><i class="fas fa-microchip" style="color: var(--accent-green);"></i> ESP32 C++ Firmware Sketch</h3>
+              <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('esp32-code-display').innerText); window.evpsApp.showToast('Firmware code copied to clipboard!', 'success');">
+                <i class="fas fa-copy"></i> Copy Code
+              </button>
+            </div>
+            <pre id="esp32-code-display" style="background: #090d16; border: 1px solid var(--glass-border); padding: 14px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; max-height: 380px; overflow: auto; color: #38bdf8;"></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 8: AUTHENTICATION / LOGIN -->
+      <!-- ================================================================= -->
+      <section id="page-login" class="page-view">
+        <div style="max-width: 440px; margin: 60px auto;" class="glass-panel">
+          <div style="padding: 30px; text-align: center;">
+            <div class="brand-badge" style="display: inline-block; margin-bottom: 12px;">EVPS AUTH</div>
+            <h2 style="font-size: 22px; margin-bottom: 6px;">Sign In to EVPS Command</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 24px;">Select a role for instant demo verification:</p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <button class="btn btn-primary" style="justify-content: center;" onclick="window.evpsApp.loginAs('ADMIN')">
+                <i class="fas fa-user-shield"></i> Login as Chief Admin (Full Control)
+              </button>
+              <button class="btn btn-secondary" style="justify-content: center;" onclick="window.evpsApp.loginAs('OPERATOR')">
+                <i class="fas fa-user-check"></i> Login as Operator (Dispatch & Track)
+              </button>
+              <button class="btn btn-secondary" style="justify-content: center;" onclick="window.evpsApp.loginAs('VIEWER')">
+                <i class="fas fa-eye"></i> Login as Viewer (Read-Only)
+              </button>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+              <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="window.evpsApp.navigateTo('support')">
+                <i class="fas fa-headset"></i> Need Authorized Support / Hotline?
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 9: CUSTOMER SUPPORT & EMERGENCY DISPATCH HELPDESK -->
+      <!-- ================================================================= -->
+      <section id="page-support" class="page-view">
+        
+        <!-- TOP EMERGENCY SOS HOTLINE BANNER -->
+        <div class="glass-panel" style="padding: 24px; margin-bottom: 20px; border-left: 4px solid var(--accent-red); background: linear-gradient(90deg, rgba(255, 23, 68, 0.1), rgba(15, 23, 42, 0.9));">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-red"><i class="fas fa-phone-volume"></i> 24/7 EMERGENCY SOS HOTLINE</span>
+                <span class="badge badge-green"><i class="fas fa-fire"></i> FIREBASE FIRESTORE SYNC ACTIVE</span>
+              </div>
+              <h2 style="font-size: 22px; margin-top: 6px;">Authorized Dispatch & Technical Helpdesk</h2>
+              <p style="color: var(--text-secondary); font-size: 13px;">Instant operator assistance, field hardware support, and Cloud Firestore incident ticket tracker.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="tel:108" class="btn btn-emergency" onclick="window.evpsApp.showToast('Connecting to Emergency Traffic Control Hotline...', 'alert');">
+                <i class="fas fa-phone-alt"></i> Traffic Control: 108
+              </a>
+              <a href="tel:+911123456789" class="btn btn-primary" onclick="window.evpsApp.showToast('Connecting to Apex Trauma Dispatcher...', 'info');">
+                <i class="fas fa-hospital"></i> Trauma Center: 112
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-COLUMN GRID: TICKETS & AI CHAT -->
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 20px;">
+          
+          <!-- LEFT: SUPPORT TICKETS & INCIDENTS (FIRESTORE) -->
+          <div class="glass-panel" style="padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="font-size: 16px;"><i class="fas fa-ticket-alt" style="color: var(--accent-cyan);"></i> Active Incident & Support Tickets</h3>
+              <button class="btn btn-secondary btn-sm" onclick="window.evpsPages.renderSupportTickets()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+
+            <!-- New Ticket Submission Form -->
+            <form onsubmit="window.evpsPages.submitSupportTicket(event)" style="background: rgba(0,0,0,0.25); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 16px; border: 1px solid var(--glass-border);">
+              <div style="font-size: 12px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 8px;">Create New Incident Ticket (Cloud Firestore):</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <select id="ticket-category" class="btn btn-secondary" style="width: 100%; font-size: 12px;">
+                  <option value="HARDWARE_FAULT">Hardware Fault (ESP32/Receiver)</option>
+                  <option value="SIGNAL_OVERRIDE">Signal Override Issue</option>
+                  <option value="GPS_DRIFT">GPS Drift / Antenna Calibration</option>
+                  <option value="SOFTWARE_INQUIRY">Software & Dispatch Assistance</option>
+                  <option value="SOS_DISPATCH">Immediate SOS Dispatch Lock</option>
+                </select>
+                <select id="ticket-priority" class="btn btn-secondary" style="width: 100%; font-size: 12px;">
+                  <option value="CRITICAL">Priority: CRITICAL (P1)</option>
+                  <option value="HIGH" selected>Priority: HIGH (P2)</option>
+                  <option value="MEDIUM">Priority: MEDIUM (P3)</option>
+                </select>
+              </div>
+              <input type="text" id="ticket-subject" placeholder="Incident Title / Location (e.g. Receiver RX-J04 Relay Error)" class="btn btn-secondary" style="width: 100%; text-align: left; margin-bottom: 10px; font-size: 12px;" required>
+              <textarea id="ticket-desc" placeholder="Detailed incident description, affected ambulance ID or junction code..." class="btn btn-secondary" style="width: 100%; height: 60px; text-align: left; margin-bottom: 10px; font-size: 12px; resize: none;" required></textarea>
+              <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 12px;">
+                <i class="fas fa-paper-plane"></i> Submit Incident & Sync to Firebase Firestore
+              </button>
+            </form>
+
+            <!-- Ticket List Container -->
+            <div id="support-tickets-list" style="max-height: 380px; overflow-y: auto; padding-right: 4px;">
+              <!-- Rendered via pages.js -->
+            </div>
+          </div>
+
+          <!-- RIGHT: 24/7 AI SMART DIAGNOSTIC & DISPATCH ASSISTANT -->
+          <div class="glass-panel" style="padding: 22px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div>
+                <h3 style="font-size: 16px;"><i class="fas fa-robot" style="color: var(--accent-green);"></i> EVPS AI Diagnostic Assistant</h3>
+                <small style="color: var(--text-muted);">Real-time troubleshooting for GPS, Relays, NRF24L01 & Dispatch</small>
+              </div>
+              <span class="badge badge-green">AI BOT ONLINE</span>
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div id="support-chat-messages" style="flex: 1; min-height: 320px; max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.3); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); margin-bottom: 12px;">
+              <div style="align-self: flex-start; background: #1e293b; border: 1px solid var(--glass-border); color: #f8fafc; padding: 10px 14px; border-radius: 12px 12px 12px 2px; font-size: 13px; max-width: 85%;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--accent-cyan);">
+                  <i class="fas fa-robot"></i>
+                  <strong>EVPS Smart Diagnostic Agent</strong>
+                </div>
+                <p style="margin: 0; color: #cbd5e1;">Welcome to EVPS Authorized Support. How can I assist with your emergency dispatch or hardware configuration today?</p>
+              </div>
+            </div>
+
+            <!-- Chat Input Box -->
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="support-chat-input" placeholder="Ask about GPS drift, relay wiring, priority timeouts..." class="btn btn-secondary" style="flex: 1; text-align: left; font-size: 12px;">
+              <button class="btn btn-primary" id="support-chat-send">
+                <i class="fas fa-paper-plane"></i> Send
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- HARDWARE DIAGNOSTICS & PINOUT QUICK REFERENCE -->
+        <div class="glass-panel" style="padding: 24px;">
+          <h3 style="font-size: 16px; margin-bottom: 14px;"><i class="fas fa-tools" style="color: var(--accent-amber);"></i> Hardware Diagnostic Reference & Field Checklist</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; font-size: 12px; color: var(--text-secondary);">
+            <div style="background: rgba(0,0,0,0.25); padding: 14px; border-radius: 8px;">
+              <strong style="color: var(--accent-cyan);">📍 GPS NEO-6M Checklist</strong>
+              <p style="margin-top: 4px;">• Baud: 9600 bps on GPIO 16 (RX) / GPIO 17 (TX).<br>• LED: Solid = Searching, Blinking = 3D Fix.<br>• Power: 3.3V / 5V DC filtered.</p>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 14px; border-radius: 8px;">
+              <strong style="color: var(--accent-green);">📡 NRF24L01+ RF Transceiver</strong>
+              <p style="margin-top: 4px;">• CE: GPIO 22 | CSN: GPIO 21.<br>• Data Rate: RF24_250KBPS on Pipe 'EVPS1'.<br>• Capacitor: 10uF across VCC/GND recommended.</p>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 14px; border-radius: 8px;">
+              <strong style="color: var(--accent-amber);">🚦 3-Channel 5V Relay Wiring</strong>
+              <p style="margin-top: 4px;">• Relay 1 (Red): GPIO 12<br>• Relay 2 (Yellow): GPIO 13<br>• Relay 3 (Green): GPIO 14<br>• Active: HIGH / LOW Optocoupler Isolated.</p>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 14px; border-radius: 8px;">
+              <strong style="color: var(--accent-red);">🛡️ Failsafe Watchdog Protocol</strong>
+              <p style="margin-top: 4px;">• Maximum Priority Hold: 45s.<br>• If ambulance halts or signal drops, normal traffic cycle auto-restores automatically.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="mobile-bottom-nav">
+      <a href="#landing" data-nav="landing" class="mobile-nav-link active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#dashboard" data-nav="dashboard" class="mobile-nav-link">
+        <i class="fas fa-map"></i>
+        <span>Command</span>
+      </a>
+      <a href="#trip-view" data-nav="trip-view" class="mobile-nav-link">
+        <i class="fas fa-route"></i>
+        <span>Trip</span>
+      </a>
+      <a href="#ambulances" data-nav="ambulances" class="mobile-nav-link">
+        <i class="fas fa-ambulance"></i>
+        <span>Fleet</span>
+      </a>
+      <a href="#support" data-nav="support" class="mobile-nav-link">
+        <i class="fas fa-headset"></i>
+        <span>Support</span>
+      </a>
+    </nav>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+  </div>
+
+  <!-- Leaflet JS CDN -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Firebase Web SDK (v9 / v10 Compat for browser) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <!-- EVPS Scripts -->
+  <script src="/static/js/firebase-config.js"></script>
+  <script src="/static/js/audio.js"></script>
+  <script src="/static/js/map.js"></script>
+  <script src="/static/js/simulation-ui.js"></script>
+  <script src="/static/js/pages.js"></script>
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>
+
