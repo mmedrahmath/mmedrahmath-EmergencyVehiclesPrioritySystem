@@ -67,7 +67,7 @@ This project is pre-configured with `render.yaml`, `Procfile`, `.python-version`
 
 2. **Create New Web Service**:
    - In the Render Dashboard, click **New +** $\rightarrow$ **Web Service**.
-   - Connect your GitHub repository: `mmedrahmath/EmergencyVehiclesPrioritySystem` (or your fork/repository).
+   - Connect your GitHub repository: `mmedrahmath/mmedrahmath-EmergencyVehiclesPrioritySystem`.
    
 3. **Configure Settings** (Automatically detected via `render.yaml` or fill manually):
    - **Name:** `emergency-vehicles-priority-system` (or any custom name)
