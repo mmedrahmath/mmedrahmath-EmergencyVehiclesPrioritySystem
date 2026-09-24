@@ -2,7 +2,8 @@
 
 **Team:** PHANTOM DELUX  
 **Theme:** SMART VEHICLES  
-**Category:** Smart Traffic Management & Emergency Vehicle Preemption
+**Category:** Smart Traffic Management & Emergency Vehicle Preemption  
+**Backend Framework:** **FastAPI** (ASGI, Asynchronous WebSockets, Pydantic, SQLite)
 
 ---
 
@@ -16,7 +17,7 @@ Using **ESP32 microcontrollers, u-blox GPS, NRF24L01+ RF transceivers, and a cen
 
 ## 🌟 Key Features
 
-1. **Rapido / Uber-Style Live Emergency Tracking**:
+1. **Live Emergency Tracking & Navigation**:
    - High-precision GPS tracking with heading angle rotation.
    - Live route progress stepper (Ambulance $\rightarrow$ Next Junction $\rightarrow$ Hospital).
    - Speedometer, Distance Remaining, and ETA countdown.
@@ -44,52 +45,102 @@ Using **ESP32 microcontrollers, u-blox GPS, NRF24L01+ RF transceivers, and a cen
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Production Tech Stack
 
-- **Backend:** Python 3.14+, FastAPI, Asynchronous WebSockets, SQLite (`aiosqlite`)
-- **Frontend:** HTML5, CSS3 Glassmorphism Design System, Vanilla JS, Leaflet.js
-- **Audio:** Web Audio API native sound synthesizer (Siren, Radar Ping, Priority Chimes)
-- **Hardware Firmware:** Arduino C++ for ESP32 NodeMCU, NEO-6M GPS, NRF24L01+ RF, 3-Channel 5V Relay
+- **Backend Framework:** FastAPI (`fastapi>=0.110.0`)
+- **ASGI Server:** Uvicorn with standard extras (`uvicorn[standard]>=0.28.0`), Gunicorn (`gunicorn>=21.2.0`)
+- **Real-time Engine:** Asynchronous WebSockets (`/ws/live`), Bidirectional Telemetry Stream
+- **Database:** SQLite (`aiosqlite` / `sqlite3`) with dynamic schema creation and automatic seed data
+- **Cloud Integrations:** Optional Google Firebase Firestore & Auth bridge via environment variables
+- **Frontend:** Responsive Single-Page Application (HTML5, Vanilla CSS Glassmorphism, Vanilla JS, Leaflet.js)
 
 ---
 
-## 🚀 Quick Start & Installation
+## 🌐 Deploying EVPS to Public HTTPS (Free Cloud Hosting)
 
-### 1. Run the Application
+This project is pre-configured with `render.yaml`, `Procfile`, `.python-version`, and dynamic `HOST` / `PORT` binding (`0.0.0.0:$PORT`) for 1-click cloud deployment on **Render**, **Railway**, or **Koyeb**.
+
+### Option A: 1-Click Deploy on Render (Recommended - Free Tier)
+
+1. **Sign Up / Log In to Render**:
+   - Go to [render.com](https://render.com) and sign in using your GitHub account.
+
+2. **Create New Web Service**:
+   - In the Render Dashboard, click **New +** $\rightarrow$ **Web Service**.
+   - Connect your GitHub repository: `mmedrahmath/EmergencyVehiclesPrioritySystem` (or your fork/repository).
+   
+3. **Configure Settings** (Automatically detected via `render.yaml` or fill manually):
+   - **Name:** `emergency-vehicles-priority-system` (or any custom name)
+   - **Environment:** `Python 3`
+   - **Region:** Any (e.g. `Oregon (US West)` or `Frankfurt (EU)`)
+   - **Branch:** `main`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `python run.py`
+   - **Instance Type:** `Free`
+
+4. **Environment Variables** (Optional):
+   - `PYTHON_VERSION`: `3.11.9`
+   - `PORT`: (Render sets this automatically)
+   - `DATABASE_PATH`: (Optional, defaults to `./evps_database.sqlite`)
+
+5. **Deploy**:
+   - Click **Create Web Service**.
+   - Render will build the container, install dependencies, and launch the service.
+   - Your public HTTPS URL will be ready in 1-2 minutes:
+     ```
+     https://emergency-vehicles-priority-system.onrender.com
+     ```
+
+---
+
+### Option B: Deploy on Railway (Free / Low Cost)
+
+1. Go to [railway.app](https://railway.app) and log in with GitHub.
+2. Click **New Project** $\rightarrow$ **Deploy from GitHub repo**.
+3. Select your repository.
+4. Railway will automatically detect the `Procfile` (`web: python run.py`) and deploy with public HTTPS and WebSocket support.
+
+---
+
+### Option C: Deploy on Koyeb (Free Tier)
+
+1. Go to [koyeb.com](https://koyeb.com) and create an account.
+2. Select **GitHub** as the deployment source and select this repository.
+3. Set the build type to **Buildpack**, Build Command `pip install -r requirements.txt`, and Run Command `python run.py`.
+4. Deploy to get a free `https://<app>.koyeb.app` URL with SSL and WebSockets.
+
+---
+
+## 🧪 Local Testing & Verification
+
+### 1. Run Server Locally
 ```bash
 python run.py
 ```
-Or with uvicorn:
+Or with custom port:
 ```bash
-python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
+$env:PORT="8080"; python run.py    # Windows PowerShell
+PORT=8080 python run.py            # Linux / macOS
 ```
 
-### 2. Access the Application
-Open your browser and navigate to:
-```
-http://localhost:8000
-```
+### 2. Run Automated End-to-End Test Suite
+To verify the full simulation lifecycle, WebSocket handshake, and REST database records:
 
----
-
-## 🎯 How to Present during SIH Demo
-
-1. Open `http://localhost:8000` to view the **Landing Page & Flowchart**.
-2. Click **"Launch Live Dashboard & Demo"**.
-3. Click the glowing red **"START EMERGENCY DEMO"** button.
-4. Watch the ambulance move in real-time along the corridor:
-   - **Corridor Radar** tracks the approaching distance (e.g. 500m $\rightarrow$ 250m $\rightarrow$ 120m).
-   - **Priority Request** is sent to Receiver `RX-ESP32-J04`.
-   - The **3D Traffic Signal** transitions immediately to **🟢 GREEN PRIORITY**.
-   - The ambulance crosses the intersection.
-   - The system displays **✓ JUNCTION CLEARED** and automatically restores normal traffic cycles.
-   - The **Live Event Log** records every timestamp and clearance duration.
-5. Explore the **Ambulance Fleet**, **Traffic Junctions**, **Analytics**, and **Admin Geofence Settings** tabs!
+- **Local test:**
+  ```bash
+  python test_e2e.py
+  ```
+- **Remote test on your deployed public HTTPS URL:**
+  ```bash
+  python test_e2e.py https://your-app-name.onrender.com
+  ```
 
 ---
 
 ## 📡 REST API & ESP32 Integration Endpoints
 
+- `GET /health` - Health check endpoint for uptime monitors.
+- `GET /ws/live` - Real-time bidirectional WebSocket telemetry stream.
 - `POST /api/ambulances/location` - Ingests live ESP32 GPS packets:
   ```json
   {
@@ -104,7 +155,7 @@ http://localhost:8000
   ```
 - `POST /api/receivers/status` - Ingests junction receiver telemetry and confirmations.
 - `POST /api/priority/override` - Dispatcher manual green signal override.
-- `GET /api/firmware/code` - Generates ready-to-flash Arduino C++ sketches for ESP32.
+- `GET /api/firmware/code` - Dynamically generates ready-to-flash Arduino C++ sketches for ESP32 with your server's live URL.
 
 ---
 

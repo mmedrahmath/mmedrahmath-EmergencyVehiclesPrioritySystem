@@ -494,13 +494,13 @@ def update_config(data: ConfigUpdateRequest):
 # ==========================================
 
 @router.get("/firmware/code")
-def get_firmware_code(device_type: str = "transmitter"):
+def get_firmware_code(request: Request, device_type: str = "transmitter"):
     """Provides ready-to-flash Arduino C++ sketches for the real ESP32 hardware."""
+    base_url = str(request.base_url).rstrip("/")
+    server_telemetry_url = f"{base_url}/api/ambulances/location"
+
     if device_type == "transmitter":
-        return {
-            "type": "AMBULANCE_TRANSMITTER",
-            "filename": "esp32_ambulance_transmitter.ino",
-            "code": """/*
+        transmitter_code = """/*
  * EVPS - Emergency Vehicles Priority System
  * ESP32 Ambulance Transmitter Firmware
  * Team: PHANTOM DELUX | Theme: SMART VEHICLES
@@ -524,7 +524,7 @@ def get_firmware_code(device_type: str = "transmitter"):
 // HARDWARE IDENTIFIER
 const char* DEVICE_ID = "TX-ESP32-A001";
 const char* AMBULANCE_ID = "A-001";
-const char* SERVER_URL = "http://192.168.1.100:8000/api/ambulances/location";
+const char* SERVER_URL = "__SERVER_TELEMETRY_URL__";
 
 TinyGPSPlus gps;
 HardwareSerial gpsSerial(2);
@@ -592,7 +592,12 @@ void loop() {
   }
   delay(500);
 }
-"""
+""".replace("__SERVER_TELEMETRY_URL__", server_telemetry_url)
+
+        return {
+            "type": "AMBULANCE_TRANSMITTER",
+            "filename": "esp32_ambulance_transmitter.ino",
+            "code": transmitter_code
         }
     else:
         return {

@@ -17,14 +17,17 @@ try:
 except ImportError:
     FIREBASE_AVAILABLE = False
 
-FIREBASE_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "firebase_service_account.json")
+FIREBASE_CONFIG_PATH = os.environ.get(
+    "FIREBASE_CONFIG_PATH",
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "firebase_service_account.json")
+)
 
 class FirebaseService:
     def __init__(self):
         self.app = None
         self.db = None
         self.is_initialized = False
-        self.project_id = "evps-phantom-delux"
+        self.project_id = os.environ.get("FIREBASE_PROJECT_ID", "evps-phantom-delux")
         self._init_firebase()
 
     def _init_firebase(self):
@@ -33,7 +36,15 @@ class FirebaseService:
             return
 
         try:
-            if os.path.exists(FIREBASE_CONFIG_PATH):
+            raw_credentials_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
+            if raw_credentials_json:
+                cred_dict = json.loads(raw_credentials_json)
+                cred = credentials.Certificate(cred_dict)
+                self.app = firebase_admin.initialize_app(cred)
+                self.db = firestore.client()
+                self.is_initialized = True
+                print("[Firebase Admin] Initialized from FIREBASE_CREDENTIALS_JSON environment variable.")
+            elif os.path.exists(FIREBASE_CONFIG_PATH):
                 cred = credentials.Certificate(FIREBASE_CONFIG_PATH)
                 self.app = firebase_admin.initialize_app(cred)
                 self.db = firestore.client()

@@ -20,9 +20,12 @@ if __name__ == "__main__":
         except Exception:
             pass
 
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", 8000))
+
     print("\n=======================================================")
     print("  EVPS - Emergency Vehicles Priority System")
     print("  Team: PHANTOM DELUX | Theme: SMART VEHICLES")
-    print("  Server running on: http://localhost:8000")
+    print(f"  Server listening on: http://{host}:{port}")
     print("=======================================================\n")
-    uvicorn.run("server.main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("server.main:app", host=host, port=port, reload=False)

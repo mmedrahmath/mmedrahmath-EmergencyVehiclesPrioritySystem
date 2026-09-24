@@ -3,10 +3,25 @@ import websockets
 import json
 import urllib.request
 import time
+import os
+import sys
+
+TARGET_URL = os.environ.get("TARGET_URL", sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000").rstrip("/")
 
 async def test_full_simulation():
-    uri = 'ws://127.0.0.1:8000/ws/live'
-    print('[TEST] Connecting to EVPS Live WebSocket at', uri)
+    # Derive websocket URI
+    if TARGET_URL.startswith("https://"):
+        ws_base = TARGET_URL.replace("https://", "wss://", 1)
+    elif TARGET_URL.startswith("http://"):
+        ws_base = TARGET_URL.replace("http://", "ws://", 1)
+    elif TARGET_URL.startswith("wss://") or TARGET_URL.startswith("ws://"):
+        ws_base = TARGET_URL
+    else:
+        ws_base = f"ws://{TARGET_URL}"
+
+    uri = f"{ws_base}/ws/live"
+    print(f'[TEST] Target HTTP URL: {TARGET_URL}')
+    print(f'[TEST] Connecting to EVPS Live WebSocket at {uri}')
     async with websockets.connect(uri) as ws:
         # Receive initial state
         init_raw = await ws.recv()
@@ -52,7 +67,7 @@ async def test_full_simulation():
                     break
 
     # Verify REST database records
-    req = urllib.request.Request('http://127.0.0.1:8000/api/crossing-events')
+    req = urllib.request.Request(f"{TARGET_URL}/api/crossing-events")
     with urllib.request.urlopen(req) as resp:
         crossings = json.loads(resp.read().decode('utf-8'))
         print(f'[DATABASE VERIFICATION] Total Crossing Events in DB: {len(crossings)}')

@@ -191,6 +191,10 @@ async def page_admin():
 async def page_login():
     return FileResponse(INDEX_HTML_PATH)
 
+@app.get("/support", response_class=HTMLResponse)
+async def page_support():
+    return FileResponse(INDEX_HTML_PATH)
+
 @app.get("/health")
 def health_check():
     return {"status": "ONLINE", "system": "EVPS Core", "team": "PHANTOM DELUX"}
